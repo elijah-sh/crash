@@ -110,6 +110,8 @@ venv.bak/
 dmypy.json
 
 .idea/
+.idea/crash.iml
+.idea/misc.xml
 
 *.iml
 
