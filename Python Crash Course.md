@@ -1,0 +1,1619 @@
+
+
+
+
+## Python文件和异常
+
+- 文件读取
+- 写入文件
+- 异常处理
+- 存储数据的实例
+
+## 文件
+
+
+
+### 1、从文件中读取数据
+
+
+
+file_reader.py
+
+```python
+with open('./../files/pi_digits.txt') as file_object:
+    content = file_object.read()
+    print(content)
+```
+
+
+
+> open() 打开文件 接受一个参数 要打开的文件名称
+>
+> close() 关闭文件，python会再合适的时间自动将其关闭
+
+
+
+逐行读取
+
+```python
+with open('./../files/pi_digits.txt') as file_object:
+    # content = file_object.read()
+    # print(content)
+    # print(content.strip())
+    for line in file_object:
+        print(line)
+        # print(line.strip())
+```
+
+
+
+使用 print(line.strip()) 去除空格
+
+
+
+使用文件内容 pi_string.py
+
+```python
+filename = './../files/pi_digits.txt'
+
+
+with open(filename) as file_object:
+    lines = file_object.readlines()
+
+pi_string = ''
+for line in lines:
+    pi_string += line.strip()
+print(pi_string)
+print(len(pi_string))
+    
+```
+
+
+
+>  strip() 删除空格
+>
+> rstrip() 删除左边空格
+
+
+
+### 2、写入文件
+
+
+
+write_message.py
+
+```python
+filename = './../files/programming.txt'
+
+with open(filename, 'w') as file_object:
+    file_object.write("I love programming")
+```
+
+
+
+open()  第一个参数 文件名， 
+
+第二个参数 'w' 以写入模式打开这个文件，可指定读取模式('r'), 写入模式('w'), 附件模式('a'), h或读取写入文件的模式('r+')。如果没有指定模式默认只读模式打开文件。
+
+
+
+写入多行 并换行
+
+```python
+filename = './../files/programming.txt'
+
+with open(filename, 'w') as file_object:
+    file_object.write("I love programming.\n")
+    file_object.write("I love creating new games.\n")
+```
+
+
+
+
+
+### 3、异常
+
+
+
+division.py
+
+```python
+print("Give me two numbers, and I`ll divide them.")
+print("Enter 'q to quit.")
+
+while True:
+    first_number = input("\nFirst number: ")
+    if first_number == 'q':
+        break
+    second_number = input("\nSecond number: ")
+
+    try:
+        answer = int(first_number) / int(second_number)
+    except ZeroDivisionError:
+        print("You can`t divide by zero!")
+    else:
+        print(answer)
+```
+
+try except 避免程序崩溃
+
+else 执行没有异常的代码块
+
+pass 使代码继续执行
+
+
+
+### 4、储存数据
+
+
+
+使用json.dupm() 和json.load()
+
+函数json.dump() 接受两个实参 ：要储存的数据以及可用于储存数据的文件对象
+
+
+
+将数字串写入文件
+
+number_writer.py
+
+
+
+```python
+import json
+
+numbers = [2, 3, 5, 7, 11, 13]
+
+filename = './../files/numbers.json'
+with open(filename, 'w') as f_obj:
+    json.dump(numbers, f_obj)
+```
+
+
+
+json.load() 加载数据
+
+
+
+保存读数用户信息
+
+
+
+remember_me.py
+
+```python
+import json
+
+# 如果以前储存了用户名，就加载他
+# 否则，就提醒用户输入用户名并储存它
+
+filename = './../files/username.json'
+try:
+    with open(filename) as f_obj:
+        username = json.load(f_obj)
+except FileNotFoundError:
+    username = input("what is your name? ")
+    with open(filename, 'w') as f_obj:
+        json.dump(username, f_obj)
+        print("We`ll remember you when you come back," + username + "!")
+else:
+    print("Welcome back, " + username + "!")
+```
+
+
+
+
+
+重构其方法，使其更有设计感
+
+
+
+```python
+import json
+
+# 如果以前储存了用户名，就加载他
+# 否则，就提醒用户输入用户名并储存它
+
+def get_stored_username():
+    """如果以前储存了用户名，就加载他"""
+    filename = './../files/username.json'
+    try:
+        with open(filename) as f_obj:
+            username = json.load(f_obj)
+    except FileNotFoundError:
+        return None
+    else:
+        return username
+
+def get_new_username():
+    """提醒用户输入用户名"""
+    username = input("what is your name? ")
+    filename = './../files/username.json'
+    with open(filename, 'w') as f_obj:
+        json.dump(username, f_obj)
+    return username
+
+def greet_user():
+    """问候用户， 并指出其名字"""
+    username = get_stored_username()
+    if username:
+        print("Welcome back, " + username + "!")
+    else:
+        username = get_new_username()
+        print("We`ll remember you when you come back," + username + "!")
+
+greet_user()
+```
+
+
+
+
+
+
+
+
+
+
+
+## chapter11 测试代码
+
+
+
+### 测试代码
+
+### 1、测试函数
+
+ 
+
+name_function.py
+
+```python
+def get_formatted_name(first, last):
+    """生成简洁的姓名"""
+    full_name = first + ' ' + last
+    return full_name.title()
+```
+
+
+
+names.py 用户输入名和姓
+
+```python
+from name_function import get_formatted_name
+
+print("Enter `q` at any time to quit.")
+while True:
+    first = input('\nPlease give me a first name: ')
+    if first == 'q':
+        break
+    last = input('\nPlease give me a last name: ')
+    if last == 'q':
+        break
+
+    formmatted_name = get_formatted_name(first, last)
+    print("\tNeatly formatted name: " + formmatted_name + '.')
+```
+
+
+
+> python标准库中的模块unttest提供代码测试工具
+>
+> 良好的测试用例考虑到了函数可能收到的各种输入
+>
+> 对于大型项目，要实现全覆盖可能很难，通常只针对代码重要行为编写测试即可
+
+
+
+test_name_function.py 测试单元
+
+```python
+import unittest
+from name_function import get_formatted_name
+
+class NameTestCase(unittest.TestCase):
+    """测试name_function.py"""
+
+    def test_first_last_name(self):
+        """能够正确地处理像Janis Joplin这样的名字吗?"""
+        formatted = get_formatted_name('janis', 'joplin')
+        self.assertEqual(formatted, 'Janis Joplin')
+
+unittest.main()
+```
+
+
+
+创建NameTestCase类，只包含一个方法，运行test_name_function.py时，以test打头的方法都将字段运行。
+
+unittest类最常见功能 断言方法，来核实得到的结果是否与期望的结果一致
+
+一致时输入的结果
+
+
+
+### 2、结果分析
+
+```
+
+----------------------------------------------------------------------
+Ran 0 tests in 0.000s
+
+OK
+
+Process finished with exit code 0
+
+Empty suite
+
+```
+
+
+
+失败时 输出结果不同
+
+
+
+```
+----------------------------------------------------------------------
+Ran 1 test in 0.000s
+
+OK
+PS C:\Users\shenshuaihu\code\PycharmProjects\crash>  py .\part1\chapter11\test_name_function.py
+F
+======================================================================
+FAIL: test_first_last_name (__main__.NameTestCase)
+能够正确地处理像Janis Joplin这样的名字吗?
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\code\PycharmProjects\crash\part1\chapter11\test_name_function.py", line 19, in test_first_last_name
+    self.assertEqual(formatted, 'Janis Joplin77')
+AssertionError: 'Janis Joplin' != 'Janis Joplin77'
+- Janis Joplin
++ Janis Joplin77
+?             ++
+
+
+----------------------------------------------------------------------
+Ran 1 test in 0.001s
+
+FAILED (failures=1)
+
+```
+
+
+
+
+
+更改name_function.py参数时
+
+```
+def get_formatted_name(first, middle, last):
+    """生成简洁的姓名"""
+    full_name = first + ' ' + middle + '' + last
+    return full_name.title()
+```
+
+
+
+
+
+```
+----------------------------------------------------------------------
+Ran 1 test in 0.000s
+
+OK
+PS C:\Users\shenshuaihu\code\PycharmProjects\crash>  py .\part1\chapter11\test_name_function.py
+F
+======================================================================
+FAIL: test_first_last_name (__main__.NameTestCase)
+能够正确地处理像Janis Joplin这样的名字吗?
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\shenshuaihu\code\PycharmProjects\crash\part1\chapter11\test_name_function.py", line 19, in test_first_last_name
+    self.assertEqual(formatted, 'Janis Joplin77')
+AssertionError: 'Janis Joplin' != 'Janis Joplin77'
+- Janis Joplin
++ Janis Joplin77
+?             ++
+
+
+----------------------------------------------------------------------
+Ran 1 test in 0.001s
+
+FAILED (failures=1)
+PS C:\Users\code\PycharmProjects\crash>  py .\part1\chapter11\test_name_function.py
+E
+======================================================================
+ERROR: test_first_last_name (__main__.NameTestCase)
+能够正确地处理像Janis Joplin这样的名字吗?
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\shenshuaihu\code\PycharmProjects\crash\part1\chapter11\test_name_function.py", line 18, in test_first_last_name
+    formatted = get_formatted_name('janis', 'joplin')
+TypeError: get_formatted_name() missing 1 required positional argument: 'last'
+
+----------------------------------------------------------------------
+Ran 1 test in 0.001s
+
+FAILED (errors=1)
+
+```
+
+
+
+
+
+---
+
+
+
+### 3、调查问卷测试实例
+
+survey.py  匿名调查类
+
+```python
+"""
+======================
+@title: survey
+@description: 匿名调查类
+@author: elijah
+@date: 2022/9/7 22:36
+=====================
+"""
+
+class AnonymousSurvey():
+    """手机匿名调查问卷的答案"""
+
+    def __init__(self, question):
+        """储存一个问题，并为存储答案做准备"""
+        self.question = question
+        self.responses = []
+
+    def show_question(self):
+        """显示调查问卷"""
+        print(self.question)
+
+    def store_response(self, new_response):
+        """存储单份调查答案"""
+        self.responses.append(new_response)
+
+    def show_resulte(self):
+        """显示收集到的所以答案"""
+        print("Survey results:")
+        for respones in self.responses:
+            print("- " + respones)
+```
+
+
+
+language_survey.py 语言调查
+
+```python
+"""
+======================
+@title: language_survey
+@description: 调查问卷
+@author: elijah
+@date: 2022/9/7 22:52
+=====================
+"""
+
+from survey import AnonymousSurvey
+
+# 定义一个问题，并创建一个表示调查的AnonymousSurvey对象
+question = "What language did you first learn to speak?"
+my_servey = AnonymousSurvey(question)
+
+# 显示问题并储存答案
+my_servey.show_question()
+print("Enter `q` at any time to quit.\n")
+while True:
+    resource = input("Language: ")
+    if resource == 'q':
+        break
+    my_servey.store_response(resource)
+
+# 显示调查结果
+print("\nThank you to everyone who participated in the survey!")
+my_servey.show_resulte()
+```
+
+
+
+测试用例
+
+```python
+"""
+======================
+@title: test_survey
+@description: 测试问卷用例
+@author: elijah
+@date: 2022/9/7 23:00
+=====================
+"""
+
+import unittest
+from survey import AnonymousSurvey
+
+class TestAnonymousSurvey(unittest.TestCase):
+    """针对AnonymousSurvey类的测试"""
+
+
+"""
+======================
+@title: test_survey
+@description: 测试问卷用例
+@author: elijah
+@date: 2022/9/7 23:00
+=====================
+"""
+
+import unittest
+from survey import AnonymousSurvey
+
+class TestAnonymousSurvey(unittest.TestCase):
+    """针对AnonymousSurvey类的测试"""
+
+
+
+    def test_store_single_response(self):
+        """测试单个答案会被妥善地储存"""
+        question = "What language did you first learn to speak?"
+        my_survey = AnonymousSurvey(question)
+        my_survey.store_response('English')
+
+        self.assertIn('English', my_survey.responses)
+
+    def test_store_three_response(self):
+        """测试三个答案会被妥善地储存"""
+        question = "What language did you first learn to speak?"
+        my_survey = AnonymousSurvey(question)
+        respones = ['English', 'Spanish', 'Chinese']
+        for respone in respones:
+            my_survey.store_response(respone)
+
+        for respone in respones:
+            self.assertIn(respone, my_survey.responses)
+
+
+unittest.main
+```
+
+
+
+
+
+### 4、方法setUp() 使用
+
+创建对象
+
+
+
+
+
+
+
+```ptyhon
+
+import unittest
+from survey import AnonymousSurvey
+
+class TestAnonymousSurvey(unittest.TestCase):
+    """针对AnonymousSurvey类的测试"""
+    
+# def test_store_single_response(self):
+#     """测试单个答案会被妥善地储存"""
+#     question = "What language did you first learn to speak?"
+#     my_survey = AnonymousSurvey(question)
+#     my_survey.store_response('English')
+#
+#     self.assertIn('English', my_survey.responses)
+#
+# def test_store_three_response(self):
+#     """测试三个答案会被妥善地储存"""
+#     question = "What language did you first learn to speak?"
+#     my_survey = AnonymousSurvey(question)
+#     respones = ['English', 'Spanish', 'Chinese']
+#     for respone in respones:
+#         my_survey.store_response(respone)
+#
+#     for respone in respones:
+#         self.assertIn(respone, my_survey.responses)
+
+def setUp(self):
+    """
+    创建一个调查对象和一组答案， 供使用的测试方法使用
+    :return:
+    """
+    question = "What language did you first learn to speak?"
+    self.my_survey = AnonymousSurvey(question)
+    self.response = ['English', 'Spanish', 'Chinese']
+
+def test_store_single_response(self):
+    """测试单个答案会被妥善地储存"""
+    self.my_survey.store_response(self.response[0])
+    self.assertIn('English', self.my_survey.responses)
+
+def test_store_three_response(self):
+    """测试三个答案会被妥善地储存"""
+    for respone in self.response:
+        self.my_survey.store_response(respone)
+
+    for respone in self.response:
+        self.assertIn(respone, self.my_survey.responses)
+```
+
+
+
+更为简洁的测试， 解决重复问题
+
+
+
+> 测试也是为了减少对项目的破坏
+>
+> 如果你编写的代码通过了测试，其他程序员也更远和你合作
+
+
+
+```
+2022/09/07
+成都封锁一周整
+3天+3天
+现在来看遥遥无期
+或者和上海一年，成都人也无法做自己的主了...
+```
+
+
+
+
+
+## Alien invasion外星人入侵
+
+
+
+#### 1、规划项目
+
+开发大型项目时，做好规划后再动手编写项目很重要。规划可确保你不偏离轨道，从而提高项目成功的可能性。
+
+开发出来的效果
+
+在游戏《外星人入侵》中，玩家控制着一艘最初出现在屏幕底部中央的飞船。玩家可以使用箭头键左右移动飞船，还可以使用空格键进行射击。
+
+游戏开始时，一群外星人出现在天空中，他们在屏幕中向下移动。玩家的任务是射杀这些外星人。
+
+
+
+#### 2、安装Pygame
+
+使用pip安装python包
+
+```shell
+# 安装pip window和osx下载方式不同
+python get-pip.py
+
+# 使用 pip 下载pygame 
+python -m pip install --user pygame  
+
+
+```
+
+
+
+#### 3、开始游戏项目
+
+##### 创建Pygame窗口以及响应用户输入
+
+创建空的Pygame的窗口，编写游戏基本结构
+
+- 初始化背景设置
+- 游戏主体
+- 监听事件等
+
+
+
+alien_invasion.py
+
+```python
+import sys
+import pygame
+
+def run_game():
+    # 初始化游戏并创建一个屏幕对象
+    pygame.init()
+    screen = pygame.display.set_mode((1200, 800))
+    pygame.display.set_caption("Alien Invasion")
+
+    # 开始游戏的主循环
+    while True:
+
+        # 监视键盘和鼠标事件
+        for event in pygame.event.get():
+            if event.type == pygame.quit():
+                sys.exit()
+
+        # 让最近绘制的屏幕可见
+        pygame.display.flip()
+
+
+run_game()
+```
+
+
+
+##### 设置背景色
+
+Pygame默认创建黑色屏幕
+
+
+
+```
+
+# 设置背景色 浅灰色
+bg_color = (230, 230, 230)
+    
+# 每次循环时都重绘制屏幕
+screen.fill(bg_color)
+```
+
+
+
+##### 创建设置类
+
+每次增加游戏新功能时，通常也将引入一些新设置，避免在项目中到处添加设置，项目增大时修改游戏外观更容易。要修改游戏，只需要修改settings.py的一些值，无需查找散步在文件中的不同设置。
+
+settings.py
+
+```python
+class Settings():
+    """储存《外星人入侵》的所有设置类"""
+
+    def __init__(self):
+        """初始化游戏的设置"""
+        # 屏幕设置
+        self.screen_width = 1200
+        self.screen_height = 800
+        self.bg_color = (230, 230, 230)
+```
+
+
+
+修改alien_invasion.py
+
+
+
+```python
+import sys
+import pygame
+from settings import Settings
+
+def run_game():
+    # 初始化游戏并创建一个屏幕对象
+    pygame.init()
+    ai_settings = Settings()
+    screen = pygame.display.set_mode((ai_settings.screen_width, ai_settings.screen_height))
+    pygame.display.set_caption("Alien Invasion")
+    
+    # 开始游戏的主循环
+    while True:
+
+        # 监视键盘和鼠标事件
+        for event in pygame.event.get():
+            if event.type == pygame.quit():
+                sys.exit()
+
+        # 每次循环时都重绘制屏幕
+        screen.fill(ai_settings.bg_color)
+        
+        # 让最近绘制的屏幕可见
+        pygame.display.flip()
+```
+
+调用pygame.init(), 再创建一个Settings实例，将其存储在变量ai_settings中
+
+
+
+#### 4、添加飞船图像
+
+加载一幅图像，再使用Pygame方法blit()绘制它。
+
+可以在此网站找 https://pixabay.com/
+
+游戏中几乎可以使用任何图像文件，单使用位图(.bmp) 文件最为简单，Pygame默认加载位图。
+
+选择图像时尽可能选择背景透明的图像。
+
+![ship](C:\Users\shenshuaihu\Downloads\《Python编程》源代码文件-更新\《Python编程》源代码文件\chapter_13\images\ship.bmp)
+
+
+
+##### 创建Ship类
+
+将其显示到屏幕上，它负责管理飞船的大部分行为
+
+ship.py
+
+```python
+import pygame
+
+
+class Ship():
+
+    def __init__(self, screen):
+        """初始化飞船并设置其初始值位置"""
+        self.screen = screen
+
+        # 加载飞船图像并获取其外接矩形
+        self.image = pygame.image.load('images/ship.bmp')
+        self.rect = self.image.get_rect()
+        self.screen_rect = screen.get_rect()
+
+        # 将每艘新飞船放在屏幕底部中央
+        self.rect.centerx = self.screen_rect.centerx
+        self.rect.bottom = self.screen_rect.bottom
+
+    def blitme(self):
+        """在指定位置绘制飞船"""
+        self.screen.blit(self.image, self.rect)
+```
+
+
+
+`__init__()` 接受两个参数，引用self和screen，screen指定了将飞船绘制到什么地方
+
+`pygame.image.load()` 加载图像 返回一个表示飞船的surface，存储到self.image中
+
+`self.rect.centerx` 飞船中心的x坐标
+
+`self.rect.bottom` 飞船下边缘的y坐标
+
+blitme方法将图像绘制到屏幕上
+
+
+
+##### 在屏幕上绘制飞船
+
+
+
+alien_invasion.py
+
+
+
+```python
+import sys
+import pygame
+from settings import Settings
+from ship import Ship
+
+
+def run_game():
+    # 初始化游戏并创建一个屏幕对象
+    pygame.init()
+    ai_settings = Settings()
+    screen = pygame.display.set_mode((ai_settings.screen_width, ai_settings.screen_height))
+    pygame.display.set_caption("Alien Invasion")
+
+    # 创建一艘飞船
+    ship = Ship(screen)
+
+    # 开始游戏的主循环
+    while True:
+
+        # 监视键盘和鼠标事件
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                sys.exit()
+
+        # 每次循环时都重绘制屏幕
+        screen.fill(ai_settings.bg_color)
+        ship.blitme()
+
+        # 让最近绘制的屏幕可见
+        pygame.display.flip()
+
+
+run_game()
+```
+
+
+
+启动报错
+
+
+
+```
+"C:/Users/ss/code/PycharmProjects/crash/part2/alieninvasion/alien_invasion.py", line 36, in run_game
+    ship.blitme()
+  File "C:\Users\ss\code\PycharmProjects\crash\part2\alieninvasion\ship.py", line 29, in blitme
+    self.screen_rect.blit(self.image, self.rect)
+AttributeError: 'pygame.Rect' object has no attribute 'blit'
+
+Process finished with exit code 1
+
+```
+
+
+
+AttributeError: 'pygame.Rect' object has no attribute 'blit'
+
+`self.screen_rect` 即 ` screen.get_rect()` 不能加载到bilt
+
+错误原因代码引用错，参考其他博主也是如此错的 是screen不是screen_rect
+
+```
+self.screen.blit(self.image, self.rect)
+```
+
+
+
+修改之后便可正常启动项目
+
+
+
+#### 5、重构： 模块game_functions
+
+
+
+在大型项目中，经常需要在添加新代码前重构既有的代码
+
+重构旨在简化既有代码的结构，使其更容易扩展。
+
+当前项目使用模块game_function，避免alien_invasion太长，使逻辑更容易理解。
+
+
+
+game_function.py
+
+隔离事件管理循环，将事件管理与游戏的其他方法分离
+
+```python
+import pygame
+import sys
+
+
+def check_event():
+    """响应按键和鼠标事件"""
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            sys.exit()
+
+
+
+def update_screen(ai_setting, screen, ship):
+    """更新屏幕上的图像，并切换到新屏幕"""
+    # 每次循环时都重绘制屏幕
+    screen.fill(ai_settings.bg_color)
+    ship.blitme()
+
+    # 让最近绘制的屏幕可见
+    pygame.display.flip()
+```
+
+
+
+调用game_function.py 方法
+
+```python
+import sys
+import pygame
+from settings import Settings
+from ship import Ship
+import game_functions as gf
+
+def run_game():
+    # 初始化游戏并创建一个屏幕对象
+    pygame.init()
+    ai_settings = Settings()
+    screen = pygame.display.set_mode((ai_settings.screen_width, ai_settings.screen_height))
+    pygame.display.set_caption("Alien Invasion")
+
+    # 创建一艘飞船
+    ship = Ship(screen)
+
+    # 开始游戏的主循环
+    while True:
+
+        # 监视键盘和鼠标事件
+        gf.check_event()
+
+        gf.update_screen(ai_settings, screen, ship)
+
+
+run_game()
+```
+
+
+
+#### 6、驾驶飞船
+
+来让玩家能够左右移动飞船
+
+在用户按左或者右箭头键时做出响应
+
+在函数check_events() 中，指定事件类型，每次按下都被注册未一个KEYDOWN事件。
+
+检测到KEYDOWN事件时，我们要检查按下的是否是特定的键。左、右等，就可以控制屏幕图像移动
+
+
+
+##### 响应按键
+
+
+
+game_function.py
+
+按下右箭头键，就增大飞船的rect.conterx值，飞船向右移动
+
+```python
+def check_event(ship):
+    """响应按键和鼠标事件"""
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            sys.exit()
+        elif event.type == pygame.KEYDOWN:
+            if event.type == pygame.K_RIGHT:
+                # 向右移动飞船
+                ship.rect.centex += 1
+```
+
+
+
+alien_invasion.py
+
+```python
+# 开始游戏的主循环
+while True:
+    # 监视键盘和鼠标事件
+    gf.check_event(ship)
+
+    gf.update_screen(ai_settings, screen, ship)
+```
+
+
+
+允许不断移动
+
+玩家按住右箭头不妨时，我们希望飞船不断地向右移动，知道玩家松开为止
+
+KEYDOWN和KEYUOP事件 键盘的按下与松开
+
+我们用标志来实现持续移动，飞船不动时，标志moving_right将为False。
+
+飞船的属性Ship添加一个moving_right的属性和一个为update()的方法
+
+
+
+ship.py
+
+```python
+class Ship():
+
+    def __init__(self, screen):
+        """初始化飞船并设置其初始值位置"""
+        self.screen = screen
+
+    
+        # 移动标志 鼠标按下事件
+        self.moving_right = False
+
+    def update(self):
+        """根据移动标志调整飞船的位置"""
+        if self.moving_right:
+            self.rect.centerx += 1
+
+     
+```
+
+
+
+alien_invasion.py
+
+```python
+def run_game():
+    # 初始化游戏并创建一个屏幕对象
+    pygame.init()
+    ai_settings = Settings()
+    screen = pygame.display.set_mode((ai_settings.screen_width, ai_settings.screen_height))
+    pygame.display.set_caption("Alien Invasion")
+
+    # 创建一艘飞船
+    ship = Ship(screen)
+
+    # 开始游戏的主循环
+    while True:
+        # 监视键盘和鼠标事件
+        gf.check_event(ship)
+        ship.update()
+        gf.update_screen(ai_settings, screen, ship)
+
+
+run_game()
+```
+
+
+
+当前程序，运行起来之后，按住右箭头飞船将不断向右移动，知道松开为止。（也可以移动到屏幕外表，哈哈）
+
+
+
+##### 左右移动
+
+同样的方式添加向作移动的逻辑
+
+使用moving_left 
+
+
+
+```python
+def check_event(ship):
+    """响应按键和鼠标事件"""
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            sys.exit()
+        elif event.type == pygame.KEYDOWN:
+            print("键盘事件： " + str(event.key))
+            if event.key == pygame.K_RIGHT:
+                # 向右移动飞船
+                # ship.rect.centex += 1
+                ship.moving_right = True
+            if event.key == pygame.K_LEFT:
+                ship.moving_left = True
+
+        elif event.type == pygame.KEYUP:
+            if event.key == pygame.K_RIGHT:
+                ship.moving_right = False
+            if event.key == pygame.K_LEFT:
+                ship.moving_left = False
+```
+
+
+
+
+
+```python
+
+class Ship():
+
+    def __init__(self, screen):
+        """初始化飞船并设置其初始值位置"""
+        self.screen = screen
+
+        # 移动标志 鼠标按下事件
+        self.moving_right = False
+        self.moving_left = False
+    
+    def update(self):
+        """根据移动标志调整飞船的位置"""
+        if self.moving_right:
+            self.rect.centerx += 1
+        if self.moving_left:
+            self.rect.centerx -= 1
+```
+
+
+
+
+
+##### 调整飞船的速度
+
+当前执行while循环时，飞船最多移动1像素，但在Settings类中添加属性ship_speed_factor, 用于控制飞船的速度。
+
+在settings.py 添加属性
+
+
+
+```python
+class Settings():
+    """储存《外星人入侵》的所有设置类"""
+
+    def __init__(self):
+        """初始化游戏的设置"""
+        # 屏幕设置
+        self.screen_width = 1000
+        self.screen_height = 700
+        # 灰 230, 230, 230 蓝 R:0 G:191 B:243
+        self.bg_color = (0, 191, 243)
+        self.bg_image = 'images/stars.bmp'
+
+        # 飞船的设置
+        self.ship_speed_factor = 1.5
+```
+
+
+
+
+
+```
+class Ship():
+
+    def __init__(self, ai_settings, screen):
+        """初始化飞船并设置其初始值位置"""
+        self.screen = screen
+        self.ai_settings = ai_settings
+
+        # 在飞船的属性center中储存小数值
+        self.center = float(self.rect.centerx)
+
+        # 移动标志 鼠标按下事件
+        self.moving_right = False
+        self.moving_left = False
+
+    def update(self):
+        """根据移动标志调整飞船的位置"""
+        if self.moving_right:
+            self.center += self.ai_settings.ship_speed_factor
+        if self.moving_left:
+            self.center -= self.ai_settings.ship_speed_factor
+
+        # 根据self.centerx 更新rect对象
+        self.rect.centerx = self.center
+
+    def blitme(self):
+        """在指定位置绘制飞船"""
+        self.screen.blit(self.image, self.rect)
+```
+
+
+
+##### 限制飞船的活动范围
+
+
+
+当前飞船无线左右移动，只要不松开键盘，可以移动到宇宙之外
+
+```python
+def update(self):
+    """根据移动标志调整飞船的位置"""
+
+    # 限制飞船活动范围
+    if self.moving_right and self.rect.right < self.screen_rect.right:
+        self.center += self.ai_settings.ship_speed_factor
+    if self.moving_left and self.rect.left > 0:
+        self.center -= self.ai_settings.ship_speed_factor
+```
+
+
+
+向右移动不能超过屏幕最大宽度，向左移动要大于1
+
+
+
+
+
+##### 重构check_events()
+
+把响应键按下和响应键松开独立出来
+
+
+
+```python
+def check_event(ship):
+    """响应按键和鼠标事件"""
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            sys.exit()
+        elif event.type == pygame.KEYDOWN:
+            print("键盘事件： " + str(event.key))
+            check_keydown_event(event, ship)
+        elif event.type == pygame.KEYUP:
+            check_keyup_event(event, ship)
+
+
+def check_keydown_event(event, ship):
+    """键盘按下"""
+    if event.key == pygame.K_RIGHT:
+        # 向右移动飞船
+        # ship.rect.centex += 1
+        ship.moving_right = True
+    if event.key == pygame.K_LEFT:
+        ship.moving_left = True
+
+
+def check_keyup_event(event, ship):
+    """键盘松开"""
+    if event.key == pygame.K_RIGHT:
+        ship.moving_right = False
+    if event.key == pygame.K_LEFT:
+        ship.moving_left = False
+```
+
+#### 7、简单回顾
+
+4个py文件，作别作用
+
+alien_invasion.py 
+
+主文件，整个游戏都要用到，包含游戏主题循环，调用check_enets(),  ship.update()的while循环
+
+其他文件也是直接或者间接引入
+
+settings.py 包含Settings类，初始化控制游戏外观和飞船速度的属性
+
+game_function.py 包含一系列函数，游戏大部分工作都是他们完成的。
+
+检测事件check_enevts
+
+#### 8、射击
+
+玩家按空格键时发射子弹（小矩形）。子弹将在屏幕中向上穿行，抵达屏幕上边缘后消失。
+
+
+
+##### 添加子弹设置
+
+settings.py
+
+```python
+# 子弹的设置
+self.bullet_speed_factor = 1
+self.bullet_width = 3
+self.bullet_height = 15
+self.bullet_color = 60, 60, 60
+```
+
+创建宽3像素，高15像素的深灰色子弹，子弹的速度比飞船稍低
+
+
+
+##### 创建Bullet类
+
+bullet.py
+
+
+
+```python
+import pygame
+from pygame.sprite import Sprite
+
+
+class Bullet(Sprite):
+    """一个对飞船发射的子弹进行管理的类"""
+
+    def __init__(self, ai_settings, screen, ship):
+        """在飞船所处的位置创键一个子弹"""
+        super(Bullet, self).__init__()
+        
+        self.screen = screen
+
+        # 在（0，0）处创建一个表示子弹的矩形，再设置正确的位置
+        self.rect = pygame.Rect(0, 0, ai_settings.bullet_width, ai_settings.bullet_height)
+        self.rect.centerx = ship.rect.centerx
+        self.rect.top = ship.rect.top
+
+        # 存储用小数表示的子弹位置
+        self.y = float(self.rect.y)
+
+        self.color = ai_settings.bullet_color
+        self.speed_factor = ai_settings.bullet_speed_
+
+    def update(self):
+        """向上移动子弹"""
+        # 更新表示子弹位置的小数值
+        self.y -= self.speed_factor
+        # 更新表示子弹的rect的位置
+        self.rect.y = self.y
+
+    def draw_bullet(self):
+        """在屏幕上绘制子弹"""
+        pygame.draw.rect(self.screen, self.color, self.rect)
+```
+
+
+
+Bullet类继承Sprite类，通过使用精灵将游戏元素编组，同时操作编组中的所有元素。调用super().__init()来继承Sprite。
+
+创建的子弹属性rect，并非基于图像，使用pagame.Rect()类从空白开始创建一个矩形。创建实例时，必须提供矩形左上角的x，y坐标和矩形的宽度高度，在(0,0)处创建这个矩形，再将其移到正确的位置
+
+子弹的centerx设置为飞船的rect.centerx。子弹从飞船顶部射出，子弹的rect的top属性为飞船的rect的top属性，这样子弹看起来就像是从飞船中射出来的
+
+方法update()管理子弹的位置。放射出去后，子弹在屏幕中向上移动，y坐标将不断减少，来更新子弹的位置，self.y中减去self.speed_factor的值。子弹发射后，x坐标始终不变，子弹沿直线垂直地往上穿行。
+
+
+
+##### 将子弹存储到编组中
+
+创建编组group，用于储存所有有效的子弹，以便于能后管理发射出去的所有字段。
+
+编组在屏幕上绘制子弹，以及更新每颗子弹的位置
+
+
+
+```python
+from pygame.sprite import Group
+
+
+def run_game():
+    # 初始化游戏并创建一个屏幕对象
+    pygame.init()
+    ai_settings = Settings()
+    screen = pygame.display.set_mode((ai_settings.screen_width, ai_settings.screen_height))
+    pygame.display.set_caption("Alien Invasion")
+
+    # 创建一艘飞船
+    ship = Ship(ai_settings, screen)
+
+    # 创建储存子弹的编组
+    bullets = Group()
+
+    # 开始游戏的主循环
+    while True:
+        # 监视键盘和鼠标事件
+        gf.check_event(ai_settings, screen, ship, bullets)
+        ship.update()
+        bullets.update()
+        gf.update_screen(ai_settings, screen, ship, bullets)
+```
+
+
+
+##### 开火
+
+修改check_keydown_events() 玩家按空格键时发射一颗子弹，松开空格键时什么都不会发生。
+
+
+
+```python
+def check_event(ai_settings, screen, ship, bullets):
+    """响应按键和鼠标事件"""
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            sys.exit()
+        elif event.type == pygame.KEYDOWN:
+            print("键盘事件： " + str(event.key))
+            check_keydown_event(event, ai_settings, screen, ship, bullets)
+        elif event.type == pygame.KEYUP:
+            check_keyup_event(event, ship)
+
+
+def check_keydown_event(event, ai_settings, screen, ship, bullets):
+    """键盘按下"""
+    if event.key == pygame.K_RIGHT:
+        # 向右移动飞船
+        # ship.rect.centex += 1
+        ship.moving_right = True
+    if event.key == pygame.K_LEFT:
+        ship.moving_left = True
+
+    if event.key == pygame.K_SPACE:
+        # 创建一颗子弹， 并将其加入到编组bullets中
+        new_bullet = Bullet(ai_settings, screen, ship)
+        bullets.add(new_bullet)
+        
+def update_screen(ai_settings, screen, ship, bullets):
+    """更新屏幕上的图像，并切换到新屏幕"""
+    # 每次循环时都重绘制屏幕
+    screen.fill(ai_settings.bg_color)
+
+    # 添加背景
+    bg_image = pygame.image.load(ai_settings.bg_image).convert()
+    screen.blit(bg_image, (0, 0))
+
+    # 在飞船和外星人后面重新绘制子弹
+    for bullet in bullets.sprites():
+        bullet.draw_bullet()        
+```
+
+
+
+启动报错,查看Bullet类是否有初始化，调用super()继续Sprite
+
+```
+ File "C:\Users\shenshuaihu\lib\site-packages\pygame\sprite.py", line 160, in add_internal
+    self.__g[group] = 0
+AttributeError: 'Bullet' object has no attribute '_Sprite__g'
+```
+
+
+
+<img src="C:\Users\shenshuaihu\AppData\Roaming\Typora\typora-user-images\image-20220914144536965.png" alt="image-20220914144536965" style="zoom:50%;" />
+
+##### 删除以消失的子弹
+
+当子弹到达屏幕顶端后消失，不仅仅是Pygame不能在屏幕绘制他们，子弹实际依然存在，y坐标为负数，越来越少。他们继续消耗内存
+
+如不删除的话，游戏的无谓工作越来越多，进而变得越来越慢。
+
+子弹的rect的bottom属性为零时，表面以及穿过屏幕顶端了
+
+
+
+```
+def run_game():
+    # 初始化游戏并创建一个屏幕对象
+    
+    ....
+
+    # 创建储存子弹的编组
+    bullets = Group()
+
+    # 开始游戏的主循环
+    while True:
+        # 监视键盘和鼠标事件
+        gf.check_event(ai_settings, screen, ship, bullets)
+        ship.update()
+        bullets.update()
+
+        # 删除已消失的子弹
+        for bullet in  bullets.copy():
+            if bullet.rect.bottom <= 0:
+                bullets.remove(bullet)
+        gf.update_screen(ai_settings, screen, ship, bullets)
+
+
+run_game()
+```
+
+
+
+限制子弹数量
+
+对屏幕上子弹数量进行限制，鼓励玩家有目标的射击
+
+settings.py
+
+```python
+self.bullets_allowed = 3
+```
+
+
+
+```python
+def check_keydown_event(event, ai_settings, screen, ship, bullets):
+    """键盘按下"""
+    if event.key == pygame.K_RIGHT:
+        # 向右移动飞船
+        # ship.rect.centex += 1
+        ship.moving_right = True
+    if event.key == pygame.K_LEFT:
+        ship.moving_left = True
+
+    if event.key == pygame.K_SPACE:
+        # 创建一颗子弹， 并将其加入到编组bullets中
+        if len(bullets) < ai_settings.bullets_allowed:
+            new_bullet = Bullet(ai_settings, screen, ship)
+            bullets.add(new_bullet)
+```
+
+
+
+##### 创建函数
+
+update_bullets()
+
+子弹管理代码独立
+
+
+
+game_funcitions.py
+
+```python
+def update_bullets(bullets):
+    """更新子弹的位置，并删除已消失的子弹"""
+    bullets.update()
+
+    # 删除已消失的子弹
+    for bullet in bullets.copy():
+        if bullet.rect.bottom <= 0:
+            bullets.remove(bullet)
+```
+
+
+
+alien_invasion.py
+
+```python
+# 开始游戏的主循环
+while True:
+    # 监视键盘和鼠标事件
+    gf.check_event(ai_settings, screen, ship, bullets)
+    ship.update()
+    gf.update_bullets(bullets)
+
+```
+
+
+
+
+
+fire_bullet()
+
+发射子弹的代码移动到一个独立的函数中
+

@@ -21,3 +21,15 @@ class Settings():
         self.bg_color = (0, 191, 243)
         self.bg_image = 'images/stars.bmp'
 
+        # 飞船的设置
+        self.ship_speed_factor = 6.5
+
+        # 子弹的设置
+        self.bullet_speed_factor = 1
+        self.bullet_width = 3
+        self.bullet_height = 15
+        self.bullet_color = 255, 0, 0
+
+        self.bullets_allowed = 3
+
+
