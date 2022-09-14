@@ -22,6 +22,15 @@ class Bullet(Sprite):
         self.rect = pygame.Rect(0, 0, ai_settings.bullet_width, ai_settings.bullet_height)
         self.rect.centerx = ship.rect.centerx
         self.rect.top = ship.rect.top
+        if ai_settings.ship_full_fire:
+            print(ai_settings.ship_full_fire_num)
+            print(ai_settings.ship_full_fire_num % 2)
+            if ai_settings.ship_full_fire_num % 2 == 0:
+                self.rect.centerx = ship.rect.centerx - ai_settings.ship_full_fire_num
+            else:
+                self.rect.centerx = ship.rect.centerx + ai_settings.ship_full_fire_num
+            self.rect.top = ship.rect.top - ai_settings.ship_full_fire_num
+            ai_settings.ship_full_fire = False
 
         # 存储用小数表示的子弹位置
         self.y = float(self.rect.y)

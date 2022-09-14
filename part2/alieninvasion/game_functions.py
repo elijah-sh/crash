@@ -36,6 +36,9 @@ def check_keydown_event(event, ai_settings, screen, ship, bullets):
     if event.key == pygame.K_SPACE:
         # 创建一颗子弹， 并将其加入到编组bullets中
         fire_bullet(ai_settings, screen, ship, bullets)
+    if event.key == pygame.K_RETURN:
+        # 加大活力
+        fire_full_bullet(ai_settings, screen, ship, bullets)
 
 
 def check_keyup_event(event, ship):
@@ -81,3 +84,18 @@ def fire_bullet(ai_settings, screen, ship, bullets):
     if len(bullets) < ai_settings.bullets_allowed:
         new_bullet = Bullet(ai_settings, screen, ship)
         bullets.add(new_bullet)
+
+
+def fire_full_bullet(ai_settings, screen, ship, bullets):
+    """加大火力"""
+    # 创建一颗子弹， 并将其加入到编组bullets中
+    i = 0
+    while i < 80:
+        # new_ship = ship.copy()
+        # new_ship.rect.centerx = ship.rect.centerx
+        ai_settings.ship_full_fire = True
+        ai_settings.ship_full_fire_num = i * 2 + i
+
+        new_bullet = Bullet(ai_settings, screen, ship)
+        bullets.add(new_bullet)
+        i += 1

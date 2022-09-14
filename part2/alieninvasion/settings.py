@@ -23,6 +23,9 @@ class Settings():
 
         # 飞船的设置
         self.ship_speed_factor = 6.5
+        self.ship_full_fire = False
+        self.ship_full_fire_num = 7
+
 
         # 子弹的设置
         self.bullet_speed_factor = 1
@@ -30,6 +33,6 @@ class Settings():
         self.bullet_height = 15
         self.bullet_color = 255, 0, 0
 
-        self.bullets_allowed = 3
+        self.bullets_allowed = 77777777777777777
 
 
