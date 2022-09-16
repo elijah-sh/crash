@@ -670,6 +670,8 @@ def test_store_three_response(self):
 
 
 
+### 武装飞船
+
 #### 1、规划项目
 
 开发大型项目时，做好规划后再动手编写项目很重要。规划可确保你不偏离轨道，从而提高项目成功的可能性。
@@ -1616,4 +1618,210 @@ while True:
 fire_bullet()
 
 发射子弹的代码移动到一个独立的函数中
+
+
+
+### 外星人
+
+项目第二篇，从屏幕上方边缘添加一个外星人，然后生成一群外星人，外星人向两边和下面移动，并删除被子弹击中的外星人，最后，我们将显示玩家拥有飞船的数量，在玩家的飞船用完之后变结束游戏。
+
+
+
+#### 创建一个外星人
+
+在平时上放置类似飞船的，创建Alien类，像Ship那样的。
+
+
+
+##### 创建alien类
+
+alien.py
+
+
+
+```python
+"""
+======================
+@title: game_functions
+@description: 游戏方法
+@author: elijah
+@date: 2022/9/9 10:10
+=====================
+"""
+
+import pygame
+import sys
+from bullet import Bullet
+
+
+def check_event(ai_settings, screen, ship, bullets):
+    """响应按键和鼠标事件"""
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            sys.exit()
+        elif event.type == pygame.KEYDOWN:
+            print("键盘事件： " + str(event.key))
+            check_keydown_event(event, ai_settings, screen, ship, bullets)
+        elif event.type == pygame.KEYUP:
+            check_keyup_event(event, ship)
+
+
+def check_keydown_event(event, ai_settings, screen, ship, bullets):
+    """键盘按下"""
+
+    if event.key == pygame.K_q:
+        sys.exit()
+
+    if event.key == pygame.K_RIGHT:
+        # 向右移动飞船
+        # ship.rect.centex += 1
+        ship.moving_right = True
+    if event.key == pygame.K_LEFT:
+        ship.moving_left = True
+
+    if event.key == pygame.K_SPACE:
+        # 创建一颗子弹， 并将其加入到编组bullets中
+        fire_bullet(ai_settings, screen, ship, bullets)
+    if event.key == pygame.K_RETURN:
+        # 加大活力
+        fire_full_bullet(ai_settings, screen, ship, bullets)
+
+
+
+def check_keyup_event(event, ship):
+    """键盘松开"""
+    if event.key == pygame.K_RIGHT:
+        ship.moving_right = False
+    if event.key == pygame.K_LEFT:
+        ship.moving_left = False
+
+
+def update_screen(ai_settings, screen, ship, alien, bullets):
+    """更新屏幕上的图像，并切换到新屏幕"""
+    # 每次循环时都重绘制屏幕
+    screen.fill(ai_settings.bg_color)
+
+    # 添加背景
+    bg_image = pygame.image.load(ai_settings.bg_image).convert()
+    screen.blit(bg_image, (0, 0))
+
+    # 在飞船和外星人后面重新绘制子弹
+    for bullet in bullets.sprites():
+        bullet.draw_bullet()
+
+    ship.blitme()
+    alien.blitme()
+
+    # 让最近绘制的屏幕可见
+    pygame.display.flip()
+
+
+def update_bullets(bullets):
+    """更新子弹的位置，并删除已消失的子弹"""
+    bullets.update()
+
+    # 删除已消失的子弹
+    for bullet in bullets.copy():
+        if bullet.rect.bottom <= 0:
+            bullets.remove(bullet)
+
+
+def fire_bullet(ai_settings, screen, ship, bullets):
+    """如果没有达到限制，就发射一颗子弹"""
+    # 创建一颗子弹， 并将其加入到编组bullets中
+    if len(bullets) < ai_settings.bullets_allowed:
+        new_bullet = Bullet(ai_settings, screen, ship)
+        bullets.add(new_bullet)
+
+
+def fire_full_bullet(ai_settings, screen, ship, bullets):
+    """加大火力"""
+    # 创建一颗子弹， 并将其加入到编组bullets中
+    i = 0
+    while i < 80:
+        # new_ship = ship.copy()
+        # new_ship.rect.centerx = ship.rect.centerx
+        ai_settings.ship_full_fire = True
+        ai_settings.ship_full_fire_num = i * 2 + i
+
+        new_bullet = Bullet(ai_settings, screen, ship)
+        bullets.add(new_bullet)
+        i += 1
+```
+
+
+
+##### 创建Alien实例
+
+在alien_invasion.py 中创建Alien实例
+
+
+
+```python
+
+from alien import Alien
+
+
+def run_game():
+    # 初始化游戏并创建一个屏幕对象
+   
+   ...
+
+    # 创建一艘飞船
+    ship = Ship(ai_settings, screen)
+
+    # 创建储存子弹的编组
+    bullets = Group()
+
+    # 创建一个外星人
+    alien = Alien(ai_settings, screen)
+
+    # 开始游戏的主循环
+    while True:
+        # 监视键盘和鼠标事件
+        gf.check_event(ai_settings, screen, ship, bullets)
+        ship.update()
+        gf.update_bullets(bullets)
+        gf.update_screen(ai_settings, screen, ship, alien, bullets)
+
+
+run_game()
+```
+
+
+
+在外星人出现在屏幕上
+
+
+
+game_funcitons.py
+
+
+
+```python
+def update_screen(ai_settings, screen, ship, alien, bullets):
+    """更新屏幕上的图像，并切换到新屏幕"""
+    # 每次循环时都重绘制屏幕
+    screen.fill(ai_settings.bg_color)
+
+    # 添加背景
+    bg_image = pygame.image.load(ai_settings.bg_image).convert()
+    screen.blit(bg_image, (0, 0))
+
+    # 在飞船和外星人后面重新绘制子弹
+    for bullet in bullets.sprites():
+        bullet.draw_bullet()
+
+    ship.blitme()
+    alien.blitme()
+
+    # 让最近绘制的屏幕可见
+    pygame.display.flip()
+```
+
+
+
+启动项目，第一个外星人变出现了
+
+
 
