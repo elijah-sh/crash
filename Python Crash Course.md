@@ -1825,3 +1825,87 @@ def update_screen(ai_settings, screen, ship, alien, bullets):
 
 
 
+#### 创建一群外星人
+
+
+
+##### 简单计算空间
+
+首先需要确定一行可以容纳多少个外星人
+
+屏幕的宽度为ai_setting.screen_width，但屏幕两边需要留空白，两个外边距，放置外星人的水平空间为屏幕宽度减去外星人宽度的两倍
+
+available_space_x = ai_setting.screen_width - (2 * alien_width)
+
+外星人直接也需要流出空白，一个外星人水平需要的宽度是两个外星人的宽度，一行容纳多少外星人可以 可利用空间除以一个外星人的宽度
+
+number_aliens_x = available_space_x  /  (2 * alien_width)
+
+
+
+##### 创建多行外星人
+
+先创建aliens的编组，用于储存外星人，再调用创建函数create_fleet
+
+
+
+alien_invasion.py
+
+```python
+def run_game():
+    # 初始化游戏并创建一个屏幕对象
+   ...
+
+    # 创建一艘飞船
+    ship = Ship(ai_settings, screen)
+
+    # 创建储存子弹的编组
+    bullets = Group()
+
+    # 一个外星人编组
+    aliens = Group()
+
+    # 创建外星人群
+    gf.create_fleet(ai_settings, screen, aliens)
+
+    # 开始游戏的主循环
+    while True:
+        # 监视键盘和鼠标事件
+        ....
+        gf.update_screen(ai_settings, screen, ship, aliens, bullets)
+
+
+run_game()
+```
+
+
+
+game_funcitons.py的update_screen() 修改参数名称 aliens
+
+##### 创建外星人群
+
+
+
+```python
+def create_fleet(ai_settings, screen, aliens):
+    """创建外星人舰队"""
+
+    # 创建一个外星人 并计算一行容纳多少人外星人
+    # 外星人间距为外星人宽度
+    alien = Alien(ai_settings, screen)
+    alien_width = alien.rect.width
+    available_space_x = ai_settings.screen_width - 2 * alien_width
+    number_aliens_x = int(available_space_x / (2 * alien_width))
+
+    # 创建一行外星人
+    for alien_number in range(number_aliens_x):
+        # 创建一个外星人并将其加入当前行
+        alien = Alien(ai_settings, screen)
+        alien.x = alien_width + 2 * alien_width * alien_number
+        alien.rect.x = alien.x
+        aliens.add(alien)
+```
+
+
+
+新增运行游戏即可以看到一行外星人了
