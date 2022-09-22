@@ -2031,3 +2031,150 @@ gf.create_fleet(ai_settings, screen, ship, aliens)
 
 现在运行游戏变可以看到外星人。
 
+
+
+也可以使用随机数来创建
+
+```python
+# 随机创建
+random_number = randint(0, 10)
+if alien_number == random_number or number_row == random_number:
+    continue
+```
+
+
+
+#### 让外星人群移动
+
+让外星人在屏幕上向右移动，撞到屏幕边缘后下移一定距离，再沿相反的方向移动。
+
+
+
+
+
+##### 向右移动
+
+```
+ # 开始游戏的主循环
+    while True:
+        # 监视键盘和鼠标事件
+        gf.check_event(ai_settings, screen, ship, bullets)
+        ship.update()
+        gf.update_bullets(bullets)
+        gf.update_aliens(aliens)
+        gf.update_screen(ai_settings, screen, ship, aliens, bullets)
+
+```
+
+
+
+game_functions.py
+
+```
+
+def update_aliens(aliens):
+    """更新外星人群中的所有外星人位置"""
+    aliens.update()
+```
+
+
+
+
+
+alien.py
+
+```
+def update(self):
+    """向右移动外星人"""
+    self.x += self.ai_settings.alien_speed_factor
+    self.rect.x = self.x
+```
+
+
+
+settings.py
+
+```
+# 外星人设置
+self.alien_speed_factor = 1
+```
+
+
+
+##### 移动方向控制
+
+
+
+```
+# 外星人设置
+self.alien_speed_factor = 1
+self.fleet_drop_speed = 10
+# fleet_direction 为1表示向右移 -1表示向左移动
+self.fleet_direction = 1
+```
+
+
+
+由于是两个方向，使用-1或者1就不会影响两个方向切换 
+
+
+
+
+
+##### 检查是否撞到了屏幕边缘
+
+
+
+```
+def check_edges(self):
+    """如果外星人位于屏幕边缘 就返回True"""
+    screen_rect = self.screen.get_rect()
+    if self.rect.right >= screen_rect.right:
+        return True
+    elif self.rect.left <= 0:
+        return True
+
+def update(self):
+    """向右移动外星人"""
+    self.x += (self.ai_settings.alien_speed_factor * self.ai_settings.fleet.direction)
+    self.rect.x = self.x
+```
+
+
+
+##### 向下移动并改变方向
+
+
+
+调用change_fleet_direction后，跳出循环，不然会一直向下
+
+
+
+```python
+def update_aliens(ai_settings, aliens):
+    """
+    检查是否有外星人位于屏幕边缘
+    更新外星人群中的所有外星人位置
+    """
+    check_fleet_edges(ai_settings, aliens)
+    aliens.update()
+
+
+def check_fleet_edges(ai_settings, aliens):
+    """有外星人到达边缘时采取相应的措施"""
+    for alien in aliens.sprites():
+        if alien.check_edges():
+            change_fleet_direction(ai_settings, aliens)
+            break
+
+
+def change_fleet_direction(ai_settings, aliens):
+    """将外星人下移并改变方向"""
+    for alien in aliens.sprites():
+        alien.rect.y += ai_settings.fleet_drop_speed
+    ai_settings.fleet_direction *= -1
+```
+
+
+
+类似的可以做成雨点，下雨天
