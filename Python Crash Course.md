@@ -2178,3 +2178,243 @@ def change_fleet_direction(ai_settings, aliens):
 
 
 类似的可以做成雨点，下雨天
+
+
+
+#### 射杀外星人
+
+sprite.groupcollide() 将每颗子弹的rect同每个外星人rect进行比较，并返回一个字典，包含碰撞的外星人和子弹，相应的值都是被击中的外星人， 两个True是删除响应的元素，如果是高能子弹的话 第一个参数可以为false不用删除。
+
+
+
+```
+# 检查是否有子弹击中外星人 如果是这样的 删除相应的子弹和外星人
+collisions = pygame.sprite.groupcollide(bullets, aliens, True, True)
+```
+
+
+
+可以改变子弹的宽度来提高射杀率
+
+```python
+self.bullet_width = 300
+```
+
+
+
+##### 生成新的外星人
+
+
+
+```
+if len(aliens) == 0:
+    # 删除现有的子弹并新建一群外星人
+    bullet.empty()
+    create_fleet(ai_settings, screen, ship, aliens)
+```
+
+
+
+提交子弹的速度，厚礼等
+
+
+
+重构update_bullets()
+
+
+
+#### 结束游戏
+
+增加趣味性
+
+##### 检测外星人和飞船碰撞
+
+
+
+```
+def update_aliens(ai_settings, ship, aliens):
+    """
+    检查是否有外星人位于屏幕边缘
+    更新外星人群中的所有外星人位置
+    """
+    ...
+
+    # 检测外形人和飞船之间碰撞
+    if pygame.sprite.spritecollideany(ship, aliens):
+        print("--------------- ship hit!!! ------------------")
+```
+
+
+
+响应外星人和飞船碰撞
+
+碰撞时，不销毁ship实例并创建一个新的ship，通过追踪游戏统计信息来记录飞船被撞的次数，便于后续记分
+
+新建GameStats 用于跟踪游戏统计信息的类
+
+game_stats.py
+
+
+
+```python
+class GameStats():
+    """跟踪游戏的统计信息"""
+
+    def __init__(self, ai_settings):
+        """初始化统计信息"""
+        self.ai_settings = ai_settings
+        self.reset_stats()
+
+    def reset_stats(self):
+        """初始化在游戏运行期间可能变化信息统计"""
+        self.ships_left = self.ai_settings.ship_limit
+```
+
+
+
+```
+# 创建一个用于储存游戏统计信息的实例
+stats = GameStats(ai_settings)
+
+# 开始游戏的主循环
+while True:
+    # 监视键盘和鼠标事件
+  
+    gf.update_aliens(ai_settings, ship, aliens, stats)
+```
+
+
+
+响应被外星人撞到的飞船
+
+撞击之后清空子弹和外星人， 创建新的外星人，把飞船放在屏幕中间，暂停1s
+
+game_functions.py
+
+```
+def ship_hit(ai_settings, stats, screen, ship, aliens, bullets):
+    """响应被外星人撞到的飞船"""
+    # 将ships_left减1
+    stats.ships_left -= 1
+
+    # 清空外星人列表和子弹
+    aliens.empty()
+    bullets.empty()
+
+    # 创建一群新的外星人 并将飞船放到屏幕底端中央
+    create_fleet(ai_settings, screen, ship, aliens)
+    ship.center_ship()
+
+    # 暂停
+    sleep(1)
+```
+
+
+
+
+
+```python
+def update_aliens(ai_settings, stats, screen, ship, aliens, bullets):
+    """
+    检查是否有外星人位于屏幕边缘
+    更新外星人群中的所有外星人位置
+    """
+    check_fleet_edges(ai_settings, aliens)
+    aliens.update()
+
+    # 检测外形人和飞船之间碰撞
+    if pygame.sprite.spritecollideany(ship, aliens):
+        print("--------------- ship hit!!! ------------------")
+        ship_hit(ai_settings, stats, screen, ship, aliens, bullets)
+```
+
+
+
+ship.py
+
+```
+def center_ship(self):
+    """让飞船在屏幕上居中"""
+    self.center = self.screen_rect.centerx
+```
+
+
+
+有外星人到达屏幕底端
+
+也做出与外星人撞击屏幕相同的响应
+
+```python
+def check_aliens_bottom(ai_settings, stats, screen, ship, aliens, bullets):
+    """检查是否有外星人到达屏幕底端"""
+    screen_rect = screen.get_rect()
+    for alien in aliens.sprites():
+        if alien.rect.bottom >= screen_rect.bottom:
+            """像飞船撞击一样处理"""
+            ship_hit(ai_settings, stats, screen, ship, aliens, bullets)
+```
+
+
+
+##### 游戏结束
+
+给定一个游戏状态，飞船用完后结束游戏
+
+game_stats.py
+
+```
+class GameStats():
+    """跟踪游戏的统计信息"""
+
+    def __init__(self, ai_settings):
+        """初始化统计信息"""
+        # 游戏启动处于活动状态
+        self.game_active = True
+```
+
+
+
+game_function.py
+
+```
+def ship_hit(ai_settings, stats, screen, ship, aliens, bullets):
+    """响应被外星人撞到的飞船"""
+    if stats.ships_left > 0:
+        # 将ships_left减1
+        stats.ships_left -= 1
+        ...
+        # 暂停
+        sleep(1)
+    else:
+        # game over
+        stats.game_active = False
+```
+
+
+
+alien_invasion.py
+
+```
+    # 开始游戏的主循环
+    while True:
+        # 监视键盘和鼠标事件
+        gf.check_event(ai_settings, screen, ship, bullets)
+
+        if stats.game_active:
+            ship.update()
+            gf.update_bullets(ai_settings, screen, ship, bullets, aliens)
+            gf.update_aliens(ai_settings, stats, screen, ship, aliens, bullets)
+
+        gf.update_screen(ai_settings, screen, ship, aliens, bullets)
+
+
+run_game()
+```
+
+
+
+当前游戏主体已经完成了，只是确认积分系统，游戏关卡，交互性比较好的UI。
+
+也是托着连续失眠疲惫身体，坚持着，也盼望着可以看到我们所期待有意义的样子
+
+2022/09/22 chengdu work in home!

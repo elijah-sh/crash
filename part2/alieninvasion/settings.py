@@ -25,7 +25,7 @@ class Settings():
         self.ship_speed_factor = 6.5
         self.ship_full_fire = False
         self.ship_full_fire_num = 7
-
+        self.ship_limit = 3
 
         # 子弹的设置
         self.bullet_speed_factor = 1
@@ -36,7 +36,7 @@ class Settings():
         self.bullets_allowed = 77777777777777777
 
         # 外星人设置
-        self.alien_speed_factor = 1
+        self.alien_speed_factor = 20
         self.fleet_drop_speed = 10
         # fleet_direction 为1表示向右移 -1表示向左移动
         self.fleet_direction = 1
