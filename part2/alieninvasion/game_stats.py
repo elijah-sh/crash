@@ -13,11 +13,13 @@ class GameStats():
 
     def __init__(self, ai_settings):
         """初始化统计信息"""
-        # 游戏启动处于活动状态
-        self.game_active = True
         self.ships_left = None
         self.ai_settings = ai_settings
         self.reset_stats()
+
+        # 游戏启动处于非活动状态
+        self.game_active = False
+
 
     def reset_stats(self):
         """初始化在游戏运行期间可能变化信息统计"""

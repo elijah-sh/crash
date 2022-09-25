@@ -2418,3 +2418,276 @@ run_game()
 也是托着连续失眠疲惫身体，坚持着，也盼望着可以看到我们所期待有意义的样子
 
 2022/09/22 chengdu work in home!
+
+
+
+
+
+---
+
+
+
+### 记分
+
+按键play按钮 用于启动游戏
+
+玩家等级提高时，增加游戏节奏
+
+实现记分系统
+
+
+
+
+
+#### 添加Play按钮
+
+
+
+```python
+class GameStats():
+    """跟踪游戏的统计信息"""
+
+    def __init__(self, ai_settings):
+        """初始化统计信息"""
+        self.ships_left = None
+        self.ai_settings = ai_settings
+        self.reset_stats()
+
+        # 游戏启动处于非活动状态
+        self.game_active = False
+```
+
+
+
+##### 创建Button类
+
+pygame没有内置创建按钮的方法，需要我们创建
+
+button.py
+
+
+
+```python
+import pygame.font
+
+
+class Button():
+
+    def __init__(self, ai_settings, screen, msg):
+        """初始化按钮的属性"""
+        self.screen = screen
+        self.screen_rect = screen.get_rect()
+
+        # 设置按钮的尺寸和其他属性
+        self.width, self.height = 200, 50
+        self.button_color = (0, 255, 0)
+        self.text_color = (255, 255, 255)
+        self.font = pygame.font.SysFont(None, 48)
+
+        # 创建按钮的rect对象， 使其居中
+        self.rect = pygame.Rect(0, 0, self.width, self.height)
+        self.rect.center = self.screen_rect.center
+
+        # 按钮的标签只需要创建一次
+        self.prep_msg(msg)
+
+    def prep_msg(self, msg):
+        """"将msg渲染为图像， 并使其在按钮上居中"""
+        self.msg_image = self.font.render(msg, True, self.text_color, self.button_color)
+        self.msg_image_rect = self.msg_image.get_rect()
+        self.msg_image_rect.center = self.rect.center
+
+    def draw_button(self):
+        """绘制一个颜色填充的按钮， 再绘制文本"""
+        self.screen.fill(self.button_color, self.rect)
+        self.screen.blit(self.msg_image, self.msg_image_rect)
+```
+
+
+
+pygame.font.SysFont 字体渲染，None使用默认字体
+
+font.render 将存储在msg中的文本转换为图像，将图像储存在msg_image中
+
+
+
+在屏幕上绘制按钮
+
+anlien_invasion.py
+
+```
+def run_game():
+    # 初始化游戏并创建一个屏幕对象
+    pygame.init()
+     
+    # 创建Play按钮
+    play_button = Button(ai_settings, screen, "Play")
+
+     ....
+
+    # 创建一个用于储存游戏统计信息的实例
+    stats = GameStats(ai_settings)
+
+    # 开始游戏的主循环
+    while True:
+        # 监视键盘和鼠标事件
+      
+
+        gf.update_screen(ai_settings, stats, screen, ship, aliens, bullets, play_button)
+
+
+run_game()
+```
+
+
+
+game_funciton.py
+
+```
+def update_screen(ai_settings, stats, screen, ship, aliens, bullets, play_button):
+ 
+    
+    # 如果游戏处于非活动状态，就绘制Play按钮
+    if not stats.game_active:
+        play_button.draw_button()
+
+    # 让最近绘制的屏幕可见
+    pygame.display.flip()
+```
+
+
+
+##### 开始游戏
+
+玩家单击Play按钮时，开始新游戏，监视与这个按钮相关的鼠标事件
+
+监听鼠标事件
+
+game_functions.py
+
+```python
+def check_event(ai_settings, screen, stats, play_button, ship, bullets):
+    """响应按键和鼠标事件"""
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            sys.exit()
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            # 鼠标事件
+            mouse_x, mouse_y = pygame.mouse.get_pos()
+            check_play_button(stats, play_button, mouse_x, mouse_y)
+```
+
+
+
+##### 重置游戏
+
+
+
+
+
+避免play重复触发
+
+```
+def check_play_button(ai_settings, screen, stats, play_button, ship, bullets, aliens, mouse_x, mouse_y):
+    """玩家单机play按钮时开始游戏"""
+    button_click = play_button.rect.collidepoint(mouse_x, mouse_y)
+    if button_click and not stats.game_active:
+
+        # 重置游戏统计信息
+        stats.reset_stats()
+        stats.game_active = True
+```
+
+
+
+
+
+```
+def check_play_button(ai_settings, screen, stats, play_button, ship, bullets, aliens, mouse_x, mouse_y):
+    """玩家单机play按钮时开始游戏"""
+    button_click = play_button.rect.collidepoint(mouse_x, mouse_y)
+    if button_click and not stats.game_active:
+
+        # 重置游戏统计信息
+        stats.reset_stats()
+        stats.game_active = True
+
+        # 清空外星人 子弹
+        aliens.empty()
+        bullets.empty()
+
+        # 创建一群新的外星人 飞船居中
+        create_fleet(ai_settings, screen, ship, aliens)
+        ship.center_ship()
+```
+
+
+
+##### 将Play按钮切换到非活动状态
+
+
+
+让游戏仅在game_active为Fasle时才开始
+
+
+
+game_function.py
+
+```
+def check_play_button(ai_settings, screen, stats, play_button, ship, bullets, aliens, mouse_x, mouse_y):
+    """玩家单机play按钮时开始游戏"""
+    button_click = play_button.rect.collidepoint(mouse_x, mouse_y)
+    if button_click and not stats.game_active:
+
+        # 重置游戏统计信息
+        ...
+```
+
+
+
+当玩家点击了Play按钮且游戏当前处于非活动状态时，游戏才重新开始
+
+
+
+##### 隐藏光标
+
+
+
+游戏开始之后变隐藏起来
+
+隐藏光标 
+
+```
+def check_play_button(ai_settings, screen, stats, play_button, ship, bullets, aliens, mouse_x, mouse_y):
+    """玩家单机play按钮时开始游戏"""
+    button_click = play_button.rect.collidepoint(mouse_x, mouse_y)
+    if button_click and not stats.game_active:
+
+        # 隐藏光标
+        pygame.mouse.set_visible(False)
+```
+
+
+
+游戏结束飞船被击中 时 显示光标
+
+显示光标
+
+```
+def ship_hit(ai_settings, stats, screen, ship, aliens, bullets):
+    """响应被外星人撞到的飞船"""
+    if stats.ships_left > 0:
+        # 将ships_left减1
+        ....
+    else:
+        # game over
+        stats.game_active = False
+        # 显示光标
+        pygame.mouse.set_visible(True)
+```
+
+
+
+#### 提交等级
+
+当前将整群外星人都消灭干净后，玩家将提高一个等级，即加快游戏的节奏，让游戏更难
