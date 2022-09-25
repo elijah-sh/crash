@@ -51,9 +51,8 @@ def check_keydown_event(event, ai_settings, screen, stats, ship, bullets, aliens
     if event.key == pygame.K_RETURN:
         # 加大活力
         fire_full_bullet(ai_settings, screen, ship, bullets)
-    if event.key ==  pygame.K_p:
+    if event.key == pygame.K_p:
         start_game(ai_settings, screen, stats, ship, bullets, aliens)
-
 
 
 def check_keyup_event(event, ship):
@@ -69,7 +68,6 @@ def check_play_button(ai_settings, screen, stats, play_button, ship, bullets, al
     button_click = play_button.rect.collidepoint(mouse_x, mouse_y)
     if button_click and not stats.game_active:
         start_game(ai_settings, screen, stats, ship, bullets, aliens)
-
 
 
 def update_screen(ai_settings, stats, screen, ship, aliens, bullets, play_button):
@@ -117,6 +115,8 @@ def check_bulled_alien_collisions(ai_settings, screen, ship, bullets, aliens):
     if len(aliens) == 0:
         # 删除现有的子弹并新建一群外星人
         bullets.empty()
+        # 提速
+        ai_settings.increase_speed()
         create_fleet(ai_settings, screen, ship, aliens)
 
 
@@ -208,6 +208,7 @@ def update_aliens(ai_settings, stats, screen, ship, aliens, bullets):
 
     check_aliens_bottom(ai_settings, stats, screen, ship, aliens, bullets)
 
+
 def check_fleet_edges(ai_settings, aliens):
     """有外星人到达边缘时采取相应的措施"""
     for alien in aliens.sprites():
@@ -257,6 +258,10 @@ def check_aliens_bottom(ai_settings, stats, screen, ship, aliens, bullets):
 
 def start_game(ai_settings, screen, stats, ship, bullets, aliens):
     """ 开始游戏 """
+
+    # 重置游戏设置
+    ai_settings.initialize_dynamic_settings()
+
     # 隐藏光标
     pygame.mouse.set_visible(False)
 

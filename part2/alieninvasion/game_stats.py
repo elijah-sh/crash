@@ -20,7 +20,7 @@ class GameStats():
         # 游戏启动处于非活动状态
         self.game_active = False
 
-
     def reset_stats(self):
         """初始化在游戏运行期间可能变化信息统计"""
         self.ships_left = self.ai_settings.ship_limit
+        self.score = 0

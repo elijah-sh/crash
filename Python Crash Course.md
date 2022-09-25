@@ -2691,3 +2691,88 @@ def ship_hit(ai_settings, stats, screen, ship, aliens, bullets):
 #### 提交等级
 
 当前将整群外星人都消灭干净后，玩家将提高一个等级，即加快游戏的节奏，让游戏更难
+
+
+
+##### 修改速度与重置速度
+
+
+
+有个初始化速度，速度增快的节奏
+
+提高速度，与初始化速度
+
+
+
+```python
+class Settings():
+    """储存《外星人入侵》的所有设置类"""
+
+    def __init__(self):
+        """初始化游戏的设置"""
+        # 屏幕设置
+        .....
+
+        # 以什么样的速度加快游戏节奏
+        self.speedup_scale = 1.1
+
+        self.initialize_dynamic_settings()
+
+    def initialize_dynamic_settings(self):
+        """初始化游戏设置"""
+        self.ship_speed_factor = 1.5
+        self.bullet_speed_factor = 3
+        self.alien_speed_factor = 1
+
+        # fleet_direction 为1表示向右移 -1表示向左移动
+        self.fleet_direction = 1
+
+    def increase_speed(self):
+        """提高速度设置"""
+        self.ship_speed_factor *= self.speedup_scale
+        self.bullet_speed_factor *= self.speedup_scale
+        self.alien_speed_factor *= self.speedup_scale
+```
+
+
+
+
+
+game_function.py
+
+点击Play时
+
+
+
+```
+def start_game(ai_settings, screen, stats, ship, bullets, aliens):
+    """ 开始游戏 """
+
+    # 重置游戏设置
+    ai_settings.initialize_dynamic_settings()
+```
+
+
+
+外星人被清空时
+
+```
+def check_bulled_alien_collisions(ai_settings, screen, ship, bullets, aliens):
+    # 检查是否有子弹击中外星人 如果是这样的 删除相应的子弹和外星人
+    collisions = pygame.sprite.groupcollide(bullets, aliens, True, True)
+
+    if len(aliens) == 0:
+        # 删除现有的子弹并新建一群外星人
+        bullets.empty()
+        # 提速
+        ai_settings.increase_speed()
+        create_fleet(ai_settings, screen, ship, aliens)
+```
+
+
+
+射击移动靶心也是如此
+
+
+
+#### 记分
