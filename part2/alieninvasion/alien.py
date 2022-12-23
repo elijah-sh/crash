@@ -6,6 +6,7 @@
 @date: 2022/9/16 22:46
 =====================
 """
+import random
 
 import pygame
 from pygame.sprite import Sprite
@@ -20,8 +21,11 @@ class Alien(Sprite):
         self.screen = screen
         self.ai_settings = ai_settings
 
+        images = ['./images/alien.png', './images/alien_1.png', './images/alien_2.png', './images/alien_3.png']
         # 加载外星人图像， 并设计其rect属性
-        self.image = pygame.image.load('./images/alien.bmp')
+        image = images[random.randint(0, 3)]
+        print("image: " + image)
+        self.image = pygame.image.load(image)
         self.rect = self.image.get_rect()
 
         # 每个外形人最初位置都在屏幕左上角附件
