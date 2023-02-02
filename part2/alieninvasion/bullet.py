@@ -23,8 +23,6 @@ class Bullet(Sprite):
         self.rect.centerx = ship.rect.centerx
         self.rect.top = ship.rect.top
         if ai_settings.ship_full_fire:
-            print(ai_settings.ship_full_fire_num)
-            print(ai_settings.ship_full_fire_num % 2)
             if ai_settings.ship_full_fire_num % 2 == 0:
                 self.rect.centerx = ship.rect.centerx - ai_settings.ship_full_fire_num
             else:

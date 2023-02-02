@@ -2776,3 +2776,186 @@ def check_bulled_alien_collisions(ai_settings, screen, ship, bullets, aliens):
 
 
 #### 记分
+
+
+
+搞一个记分系统，实时跟踪玩家的得分，并显示最高得分，当前等级和余下飞船数
+
+新建game_stats.py 
+
+
+
+##### 显示得分
+
+新建scoreboard.py 文件 用户记录得分相关数据
+
+
+
+
+
+```python
+import pygame.font
+
+
+class Scoreboard:
+    """显示得分信息的类"""
+
+    def __init__(self, ai_settings, screen, stats):
+        """初始化显示得分涉及的属性"""
+        self.score_image = None
+        self.score_rect = None
+        self.screen = screen
+        self.screen_rect = screen.get_rect()
+        self.ai_setting = ai_settings
+        self.stats = stats
+
+        # 显示得分信息时使用的字体设置
+        self.text_color = (30, 30, 30)
+        self.font = pygame.font.SysFont(None, 48)
+
+        # 准备初始得分图像
+        self.prep_score()
+
+    def prep_score(self):
+        """将得分转换一幅渲染的图像"""
+        score_str = str(self.stats.score)
+        self.score_image = self.font.render(score_str, True, self.text_color, self.ai_setting.bg_color)
+
+        # 将得分放在屏幕右上角
+        self.score_rect = self.score_image.get_rect()
+        self.score_rect.right = self.screen_rect.right - 20
+        self.score_rect.top = self.screen_rect.top - 20
+
+
+    def show_score(self):
+        """在屏幕上显示得分"""
+        self.screen.blit(self.score_image, self.score_rect)
+
+```
+
+
+
+prep_score 将显示的文本转换为图像
+
+
+
+##### 创建记分牌
+
+需要在alien_invasion.py 中创建一个Scoreboard实例：
+
+
+
+```
+from scoreboard import Scoreboard
+
+def run_game():
+	....
+ # 创建一个用于储存游戏统计信息的实例
+    stats = GameStats(ai_settings)
+    sb = Scoreboard(ai_settings, screen, stats)
+    
+    # 开始游戏的主循环
+    while True:
+
+        gf.update_screen(ai_settings, stats, sb, screen, ship, aliens, bullets, play_button)
+
+```
+
+
+
+game_functions.py
+
+```
+def update_screen(ai_settings, stats, sb, screen, ship, aliens, bullets, play_button):
+
+
+    # 显示得分
+    sb.show_score()
+```
+
+
+
+在外星人被消灭时更新积分
+
+每次增加50，发生子弹与外星人碰撞时更新分组，修改传递参数
+
+
+
+
+
+```
+class Settings():
+    """储存《外星人入侵》的所有设置类"""
+
+    def __init__(self):
+
+        # 记分
+        self.alien_points = 50
+```
+
+
+
+game_functions.py
+
+```
+def check_bulled_alien_collisions(ai_settings, stats, sb, screen, ship, bullets, aliens):
+    # 检查是否有子弹击中外星人 如果是这样的 删除相应的子弹和外星人
+    collisions = pygame.sprite.groupcollide(bullets, aliens, True, True)
+
+    if collisions:
+        stats.score += ai_settings.alien_points
+        sb.prep_score()
+```
+
+
+
+
+
+##### 消灭的每个外星人都计入得分
+
+目前一共子弹同时碰撞到多个外星人时是计算一次积分（增加字段宽度可以测试），或者两颗子弹同事击中一个外星人也会有如此的情形。
+
+
+
+调整检测子弹和外星人碰撞的方式
+
+```
+if collisions:
+    for aliens in collisions.values():
+        stats.score += ai_settings.alien_points * len(aliens)
+        sb.prep_score()
+```
+
+
+
+如果字典collisions存在，我们就遍历其中所有值。每个值都是一个列表，包含同一子弹击中的所有外星人，
+
+
+
+##### 提高点数
+
+玩家每提高一个等级，游戏都变得更难，外星人的点数也提高。
+
+
+
+settings.py
+
+```
+     def __init__(self):
+
+        # 外星人点数提高速度
+        self.score_scale = 1.5
+
+
+
+    def increase_speed(self):
+        """提高速度设置和外星人点数"""
+        
+
+        # 分数 * 点数
+        self.alien_points = int(self.alien_points * self.score_scale)
+        print("alien points " + str(self.alien_points))
+
+
+```
+

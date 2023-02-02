@@ -21,10 +21,9 @@ class Alien(Sprite):
         self.screen = screen
         self.ai_settings = ai_settings
 
-        images = ['./images/alien.png', './images/alien_1.png', './images/alien_2.png', './images/alien_3.png']
+        images = ['./images/alien.png', './images/alien_1.png', './images/alien_2.png', './images/alien_3.png', './images/axin.png']
         # 加载外星人图像， 并设计其rect属性
         image = images[random.randint(0, 3)]
-        print("image: " + image)
         self.image = pygame.image.load(image)
         self.rect = self.image.get_rect()
 
