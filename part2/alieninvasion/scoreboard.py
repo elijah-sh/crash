@@ -23,21 +23,54 @@ class Scoreboard:
 
         # 显示得分信息时使用的字体设置
         self.text_color = (30, 30, 30)
-        self.font = pygame.font.SysFont(None, 48)
+        self.text_white_color = (255, 255, 255)
+        self.font = pygame.font.SysFont(None, 30)
 
         # 准备初始得分图像
         self.prep_score()
+        # 最高分和当前得分
+        self.prep_high_score()
+
+        # 等级
+        self.prep_level()
 
     def prep_score(self):
         """将得分转换一幅渲染的图像"""
-        score_str = str(self.stats.score)
-        self.score_image = self.font.render(score_str, True, self.text_color, self.ai_setting.bg_color)
+        rounded_score = int(round(self.stats.score, -1))
+        score_str = "Score: " + "{:,}".format(rounded_score)
+
+        # score_str = str(self.stats.score)
+        self.score_image = self.font.render(score_str, True, self.text_white_color)
 
         # 将得分放在屏幕右上角
         self.score_rect = self.score_image.get_rect()
         self.score_rect.right = self.screen_rect.right - 10
-        self.score_rect.top = self.screen_rect.top - 5
+        self.score_rect.top = self.screen_rect.top
 
     def show_score(self):
         """在屏幕上显示得分"""
         self.screen.blit(self.score_image, self.score_rect)
+        self.screen.blit(self.high_score_image, self.high_score_rect)
+        self.screen.blit(self.level_image, self.level_rect)
+
+    def prep_high_score(self):
+        """将最高得分转换为渲染等图像"""
+        high_score = int(round(self.stats.high_score, -1))
+        high_score_str = "Hight Score: " + "{:,}".format(high_score)
+
+        # , self.ai_setting.bg_color
+        self.high_score_image = self.font.render(high_score_str, True, self.text_white_color)
+
+        """将最高得分放在屏幕顶部中央"""
+        self.high_score_rect = self.high_score_image.get_rect()
+        self.high_score_rect.right = self.score_rect.right - 600
+        self.high_score_rect.top = self.score_rect.top
+
+    def prep_level(self):
+        """将等级转换为渲染的图像"""
+        self.level_image = self.font.render("Level: " + str(self.stats.level), True, self.text_white_color)
+
+        # 将等级放在得分下方
+        self.level_rect = self.level_image.get_rect()
+        self.level_rect.right = self.score_rect.right
+        self.level_rect.top = self.score_rect.bottom + 10

@@ -68,6 +68,7 @@ class Settings():
         self.alien_speed_factor *= self.speedup_scale
 
         # 分数 * 点数
-        self.alien_points = int(self.alien_points * self.score_scale)
+        # self.alien_points = int(self.alien_points * self.score_scale)
+        self.alien_points = int(self.alien_points)
         print("alien points " + str(self.alien_points))
 

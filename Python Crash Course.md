@@ -2779,6 +2779,11 @@ def check_bulled_alien_collisions(ai_settings, screen, ship, bullets, aliens):
 
 
 
+
+
+
+
+
 搞一个记分系统，实时跟踪玩家的得分，并显示最高得分，当前等级和余下飞船数
 
 新建game_stats.py 
@@ -2959,3 +2964,185 @@ settings.py
 
 ```
 
+
+
+##### 将得分圆整
+
+方便直接观看，每三位用逗号隔开
+
+```python
+rounded_score = int(round(self.stats.score, -1))
+score_str = "{:,}".format(rounded_score)
+```
+
+
+
+round() 通常精确小数点后多少位，如果是负数的化，则是10，100，1000等整数倍
+
+
+
+##### 最高得分
+
+实现思路与得分相近，最高分来源是每次得分，而且不会被重置
+
+
+
+game_stats.py
+
+```
+class GameStats:
+    """跟踪游戏的统计信息"""
+
+    def __init__(self, ai_settings):
+        """初始化统计信息"""
+        
+        # .....
+
+        # 在任何情况下都不应重制最高分
+        self.high_score = 0
+```
+
+
+
+scoreboard.py
+
+```
+class Scoreboard:
+    """显示得分信息的类"""
+
+    def __init__(self, ai_settings, screen, stats):
+        """初始化显示得分涉及的属性"""
+        
+        # ....
+          # 最高分和当前得分
+        self.prep_high_score()
+        
+     def prep_score(self):
+        """将得分转换一幅渲染的图像"""
+        rounded_score = int(round(self.stats.score, -1))
+        score_str = "{:,}".format(rounded_score)
+        
+        
+    def show_score(self):
+        """在屏幕上显示得分"""
+        self.screen.blit(self.score_image, self.score_rect)
+        self.screen.blit(self.high_score_image, self.high_score_rect)
+
+
+    def prep_high_score(self):
+        """将最高得分转换为渲染等图像"""
+        high_score = int(round(self.stats.high_score, -1))
+        high_score_str = "{:,}".format(high_score)
+        self.high_score_image = self.font.render(high_score_str, True, self.text_color, self.ai_setting.bg_color)
+
+        """将最高得分放在屏幕顶部中央"""
+        self.high_score_rect = self.high_score_image.get_rect()
+        self.high_score_rect.right = self.screen_rect.centerx
+        self.high_score_rect.top = self.screen_rect.top
+
+        
+```
+
+
+
+game_functions.py 调用入口
+
+```
+
+def check_bulled_alien_collisions(ai_settings, stats, sb, screen, ship, bullets, aliens):
+    # 检查是否有子弹击中外星人 如果是这样的 删除相应的子弹和外星人
+    collisions = pygame.sprite.groupcollide(bullets, aliens, True, True)
+
+    if collisions:
+        for aliens in collisions.values():
+            stats.score += ai_settings.alien_points * len(aliens)
+            sb.prep_score()
+        check_high_score(stats, sb)
+
+
+
+def check_high_score(stats, sb):
+    """检查是否诞生了新的最高分"""
+    if stats.score > stats.high_score:
+        stats.high_score = stats.score
+        sb.prep_high_score()
+```
+
+
+
+外星人被击中时，便去调用check_high_score去检查是否诞生了新的最高分
+
+最高分出现在中央，当前分出现在右边
+
+
+
+##### 显示等级
+
+
+
+首先在GameStats中添加当前等级属性，确保游戏开始时都重置
+
+与现实得分思路相近
+
+- 初始化等级1
+- 渲染图像显示在屏幕上 prep_level
+- 外星人都消灭完时，增加一个等级  check_bulled_alien_collisions
+- 游戏开始play时重置等级 start_game
+
+
+
+GameStats.py
+
+```
+def reset_stats(self):
+    """初始化在游戏运行期间可能变化信息统计"""
+    self.ships_left = self.ai_settings.ship_limit
+    # 得分
+    self.score = 0
+    # 等级
+    self.level = 0
+```
+
+
+
+Scoreboard.py
+
+```
+
+ def show_score(self):
+        """在屏幕上显示得分"""
+        self.screen.blit(self.score_image, self.score_rect)
+        self.screen.blit(self.high_score_image, self.high_score_rect)
+        self.screen.blit(self.level_image, self.level_rect)
+
+    def prep_level(self):
+        """将等级转换为渲染的图像"""
+        self.level_image = self.font.render(str(self.stats.level), True, self.text_color, self.ai_setting.bg_color)
+
+        # 将等级放在得分下方
+        self.level_rect = self.level_image.get_rect()
+        self.level_rect.right = self.score_rect.right
+        self.level_rect.top = self.score_rect.bottom + 10
+```
+
+
+
+game_functions.py
+
+```
+def start_game(ai_settings, screen, stats, sb, ship, bullets, aliens):
+    """ 开始游戏 """
+
+   
+    # 重新记分牌图像
+    sb.prep_score()
+    sb.prep_high_score()
+    sb.prep_level()
+
+```
+
+需要增加一个入参sb（scoreboard）
+
+
+
+屏幕对应的数字也可以去拼接参数显示得分带标签，如Score，Hight Score和Level
