@@ -3146,3 +3146,57 @@ def start_game(ai_settings, screen, stats, sb, ship, bullets, aliens):
 
 
 屏幕对应的数字也可以去拼接参数显示得分带标签，如Score，Hight Score和Level
+
+
+
+##### 显示剩余飞船数
+
+
+
+ship.py
+
+
+
+scoreboard.py 
+
+```
+    def prep_ships(self):
+        """显示还剩余多少艘飞船"""
+        self.ships = Group()
+        for ship_number in range(self.stats.ships_left):
+            ship = Ship(self.ai_settings, self.screen)
+            ship.rect.x = 10 + ship_number * ship.rect.width
+            ship.rect.y = 10
+            self.ships.add(ship)
+            
+            
+    def show_score(self):
+        """在屏幕上显示得分"""
+        self.screen.blit(self.score_image, self.score_rect)
+        self.screen.blit(self.high_score_image, self.high_score_rect)
+        self.screen.blit(self.level_image, self.level_rect)
+
+        # 绘制飞船
+        self.ships.draw(self.screen)         
+```
+
+
+
+在game_functions.py中调用
+
+飞船发生撞击时，更新记分牌
+
+
+
+```
+def ship_hit(ai_settings, stats, sb, screen, ship, aliens, bullets):
+    """响应被外星人撞到的飞船"""
+    if stats.ships_left > 0:
+        # 将ships_left减1
+        stats.ships_left -= 1
+
+        # 更新记分牌
+        sb.prep_ships()
+```
+
+也需要把想对应的参数sb添加上去
