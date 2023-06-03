@@ -11,9 +11,7 @@
 
 ## 文件
 
-
-
-### 1、从文件中读取数据
+## 1、从文件中读取数据
 
 
 
@@ -3200,3 +3198,307 @@ def ship_hit(ai_settings, stats, sb, screen, ship, aliens, bullets):
 ```
 
 也需要把想对应的参数sb添加上去
+
+
+
+
+----
+
+
+
+
+
+如今游戏部分已经完成，虽然很期待的样子，自然也少不了成长，跟着文本来，也难免失去一下思考，新的2023也必在春天成长！
+
+
+
+2023/02/15 成都 孕育未来中...
+
+https://www.jianshu.com/u/c9df5d4ce495
+
+[上]: https://www.jianshu.com/u/c9df5d4ce495
+
+
+
+
+
+
+
+## 数据可视化
+
+
+
+
+
+### 生成数据
+
+#### 1、安装matplotlib
+
+ 使用pip
+
+
+
+#### 2、绘制简单的折线图
+
+
+
+mpl_squares.py
+
+
+
+```python
+import matplotlib.pyplot as plt
+
+squares = [1, 4, 9, 16, 25]
+plt.plot(squares, linewidth=5)
+
+plt.show()
+```
+
+
+
+##### 2.1 修改标签文字和线条粗线
+
+
+
+```python
+import matplotlib.pyplot as plt
+
+squares = [1, 4, 9, 16, 25]
+plt.plot(squares, linewidth=5)
+
+# 设置表标题，并给坐标轴加上标签
+plt.title("Square Numbers", fontsize=24)
+plt.xlabel("Value", fontsize=14)
+plt.ylabel("Square of Value", fontsize=14)
+
+# 设置刻度标记大小
+plt.tick_params(axis='both', labelsize=14)
+
+
+plt.show()
+```
+
+
+
+- 函数title给图标指定标题
+- 函数label则制定轴线的标题
+- tick_params设置刻度样式
+
+
+
+<img src="Python Crash Course.assets/image-20230405104153445.png" alt="image-20230405104153445" style="zoom:50%;" />
+
+
+
+
+
+##### 2.2 校正图形
+
+
+
+目前发现没有正确绘制数据，折线图的终点指出4.0的平方为25
+
+plot() 提供数字时，假设第一个数据点对应的x坐标值为0，但我们指定的x是1.
+
+可以通过给plot()同时提供输入值和输出值:
+
+```
+input_values = [1, 2, 3, 4, 5]
+squares = [1, 4, 9, 16, 25]
+plt.plot(input_values, squares, linewidth=5)
+```
+
+![image-20230405105451582](Python Crash Course.assets/image-20230405105451582.png)
+
+
+
+plot() 可指定各种实参
+
+
+
+##### 2.3 使用scatter() 绘制散点图 并设置样式
+
+[ˈskætər]
+
+绘制散点图需要设置各个点点样式。
+
+一个颜色显示比较小的值，另一种颜色显示比较大的值。
+
+绘制大型数据集时，不同的样式绘制某些点，来突出
+
+
+
+绘制单个点，可使用函数scatter()，并向它传递x,y坐标。
+
+
+
+scatter_squares.py
+
+```
+import matplotlib.pyplot as plt
+
+plt.scatter(2, 4)
+plt.show()
+```
+
+
+
+
+
+![image-20230405110744417](Python Crash Course.assets/image-20230405110744417.png)
+
+设置点的大小
+
+```
+plt.scatter(2, 4, s=200)
+```
+
+
+
+```
+
+import matplotlib.pyplot as plt
+
+plt.scatter(2, 4, s=200)
+
+# 设置图表标题并给坐标轴加上标签
+plt.title("Square Numbers", fontsize=24)
+plt.xlabel("Value", fontsize=14)
+plt.ylabel("Square of Value", fontsize=14)
+
+# 设置刻度标记大小
+plt.tick_params(axis='both', which='major', labelsize=8)
+plt.show()
+```
+
+
+
+<img src="Python Crash Course.assets/image-20230405112437922.png" alt="image-20230405112437922" style="zoom:50%;" />
+
+
+
+##### 2.4 使用scatter() 绘制一系列点
+
+
+
+向scatter传递值，绘制的图标即(1, 1)  、(2, 4) 、(3, 9)等
+
+```
+import matplotlib.pyplot as plt
+
+x_values = [1, 2, 3, 4, 5]
+y_values = [1, 4, 9, 16, 25]
+
+plt.scatter(x_values, y_values, s=200)
+
+# 设置图表标题并给坐标轴加上标签
+plt.title("Square Numbers", fontsize=24)
+plt.xlabel("Value", fontsize=14)
+plt.ylabel("Square of Value", fontsize=14)
+
+# 设置刻度标记大小
+plt.tick_params(axis='both', which='major', labelsize=8)
+plt.show()
+
+```
+
+
+
+<img src="Python Crash Course.assets/image-20230603214024808.png" alt="image-20230603214024808" style="zoom:50%;" />
+
+
+
+##### 2.5 自动计数数据
+
+
+
+手工绘制效率低下，可以通过循环来绘制1000个点
+
+
+
+```
+import matplotlib.pyplot as plt
+
+x_values = list(range(1, 1001))
+y_values = [x**2 for x in x_values]
+
+plt.scatter(x_values, y_values, s=200)
+
+# 设置图表标题并给坐标轴加上标签
+plt.title("Square Numbers", fontsize=24)
+plt.xlabel("Value", fontsize=14)
+plt.ylabel("Square of Value", fontsize=14)
+
+# 设置刻度标记大小
+plt.tick_params(axis='both', which='major', labelsize=8)
+
+# 设置每个坐标轴等取值范围
+plt.axis([0, 1100, 0, 1100000])
+plt.show()
+```
+
+<img src="Python Crash Course.assets/image-20230603215150737.png" alt="image-20230603215150737" style="zoom:50%;" />
+
+##### 2.6 删除数据点的轮廓
+
+matplotlib允许指定颜色，默认上蓝色点和黑色轮廓，edgecolors='none' 可以删除数据点的轮廓
+
+```
+plt.scatter(x_values, y_values, edgecolors='none', s=200)
+```
+
+
+
+##### 2.7 自定义颜色
+
+修改数据点的颜色，可传递参数c，
+
+```
+plt.scatter(x_values, y_values, c='red', edgecolors='none', s=200)
+```
+
+
+
+还可以使用RGB颜色模式自定义,红绿蓝，值越接近0，指定颜色越深，值越接近1，颜色越浅。
+
+```
+plt.scatter(x_values, y_values, c=(0, 0, 0.8), edgecolors='none', s=200)
+```
+
+
+
+##### 2.8 使用颜色映射
+
+颜色映射（colormap）是一系列颜色，从起始颜色渐变到结束颜色。在可视化中，颜色映射用于突出数据的规律。
+
+模块pyplot内置了一组颜色映射。
+
+
+
+```
+plt.scatter(x_values, y_values, c=y_values, cmap=plt.cm.Blues, edgecolors='none', s=200)
+```
+
+参数c设置成y值列表，参数cmap指定颜色，代码将y值较小的点现实为浅蓝色，y值较大的点现实深蓝色。
+
+<img src="Python Crash Course.assets/image-20230603221158973.png" alt="image-20230603221158973" style="zoom:50%;" />
+
+
+
+可参考 https://matplotlib.org/
+
+
+
+##### 2.9 自动保存图标
+
+将生成的图表保存到文件中，将plt.show 替换为 plt.savefig
+
+```
+plt.savefig('squares_plot.png', bbox_inches='tight')
+```
+
+第一个参数指定文件名字，第二个参数将图表多余空白区域裁剪掉，也可以省略后着
+
+
+
